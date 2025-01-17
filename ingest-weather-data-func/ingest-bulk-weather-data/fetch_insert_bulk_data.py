@@ -65,9 +65,6 @@ def fetch_and_insert_bulk_weather_data():
     except requests.exceptions.RequestException as e:
         print(f"Error occurred while fetching weather data: {e}")
 
-    except ValueError as e:
-        print(f"ValueError: {e}")
-
     except Exception as e:
         traceback.print_exc()
         print(f"An unexpected error occurred: {e}")
