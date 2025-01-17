@@ -23,15 +23,15 @@ jobs:
         with:
           terraform_version: 1.5.6
 
-      - name: Authenticate with GCP
-        run: echo "${{ secrets.GOOGLE_CREDENTIALS }}" > gcp-key.json
+      # - name: Authenticate with GCP
+      #   run: echo "${{ secrets.GOOGLE_CREDENTIALS }}" > gcp-key.json
 
       
-      - name: Authenticate to Google Cloud
-        run: |
-          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > gcp-key.json
-          gcloud auth activate-service-account --key-file=gcp-key.json
-          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GOOGLE_CREDENTIALS }}
 
       - name: Zip Function Code
         run: |
