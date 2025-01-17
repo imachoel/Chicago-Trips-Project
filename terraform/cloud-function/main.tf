@@ -1,8 +1,3 @@
-resource "google_storage_bucket" "function_bucket" {
-  name                        = "${var.project_id}-function-bucket"
-  location                    = "US"
-  uniform_bucket_level_access = true
-}
 
 resource "google_cloudfunctions_function" "weather_function" {
   name        = "ingest-weather-data"
