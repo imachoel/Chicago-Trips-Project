@@ -28,7 +28,7 @@ jobs:
 
       - name: Zip Function Code
         run: |
-          cd ingestweatherdatafunc
+          cd ingest-weather-data-func
           zip -r ../function.zip .
         shell: bash
 
