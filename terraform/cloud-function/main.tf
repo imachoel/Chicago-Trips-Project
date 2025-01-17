@@ -1,8 +1,3 @@
-variable "project_id" {}
-variable "weather_api_key" {}
-variable "bigquery_dataset_id" {}
-variable "bigquery_table_name" {}
-
 resource "google_storage_bucket" "function_bucket" {
   name                        = "${var.project_id}-function-bucket"
   location                    = "US"
