@@ -1,7 +1,6 @@
 import os
 import traceback
 import requests
-from dotenv import load_dotenv
 from google.cloud import bigquery
 
 
@@ -72,8 +71,3 @@ def fetch_and_insert_bulk_weather_data():
     except Exception as e:
         traceback.print_exc()
         print(f"An unexpected error occurred: {e}")
-
-
-if __name__ == "__main__":
-    load_dotenv()
-    fetch_and_insert_bulk_weather_data()
