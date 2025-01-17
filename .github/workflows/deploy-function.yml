@@ -28,10 +28,10 @@ jobs:
 
       
       - name: Authenticate to Google Cloud
-      run: |
-        echo "${{ secrets.GOOGLE_CREDENTIALS }}" > gcp-key.json
-        gcloud auth activate-service-account --key-file=gcp-key.json
-        gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > gcp-key.json
+          gcloud auth activate-service-account --key-file=gcp-key.json
+          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Zip Function Code
         run: |
