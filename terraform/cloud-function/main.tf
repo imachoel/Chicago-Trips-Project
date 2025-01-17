@@ -1,4 +1,5 @@
 
+
 resource "google_cloudfunctions_function" "weather_function" {
   name        = "ingest-weather-data"
   runtime     = "python310"
@@ -21,6 +22,6 @@ resource "google_cloudfunctions_function" "weather_function" {
 
 resource "google_storage_bucket_object" "function_zip" {
   name   = "function.zip"
-  bucket = google_storage_bucket.function_bucket.name
+  bucket = "${var.project_id}-function-bucket"
   source = "function.zip"
 }
