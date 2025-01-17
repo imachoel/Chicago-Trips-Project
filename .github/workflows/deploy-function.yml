@@ -1,0 +1,36 @@
+name: Deploy Cloud Function
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'ingest-weather-data-func/**' # Trigger pipeline only when function code is modified
+      - 'terraform/cloud_function/**'
+
+jobs:
+  deploy-cloud-function:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Zip Function Code
+        run: |
+          cd function_code
+          zip -r ../function_code.zip .
+          cd ..
+
+      - name: Terraform Init
+        working-directory: terraform/cloud_function
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: terraform/cloud_function
+        run: terraform apply -auto-approve

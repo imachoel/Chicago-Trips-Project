@@ -1,0 +1,32 @@
+name: Run Tests on Pull Request
+
+on:
+  pull_request:
+    branches:
+      - main  # Run tests for PRs targeting the main branch
+
+jobs:
+  test-cloud-function:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9' # Adjust the version as needed
+
+      - name: Install Dependencies
+        run: |
+          pip install -r ingest-weather-data-func/requirements.txt
+
+      - name: Run Unit Tests
+        run: |
+          pytest ingest-weather-data-func/tests/
+
+      - name: Lint Code
+        run: |
+          pip install pylint
+          pylint function_code/*.py

@@ -1,0 +1,71 @@
+# .NET
+bin/
+obj/
+.csx
+.vs/
+.vscode/
+Publish/
+*.user
+*.suo
+*.cscfg
+*.Cache
+project.lock.json
+/packages
+/TestResults
+
+# Secrets and Configuration
+/secrets/
+.data/
+.secrets/
+appsettings.json
+local.settings.json
+
+# Python
+# Local python packages
+.python_packages/
+
+# Python Environments
+.env/
+.env_test/
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+pyvenv.cfg
+
+# Ignore files created by IDEs/editors
+.idea/
+.vscode/
+.vs/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+*.backup
+.terraform.lock.hcl
+
+# Node.js
+node_modules/
+dist/
+
+# IDE/editor history files
+.history/
+
+# macOS
+.DS_Store
+
+# Misc
+azlogin.txt
+
+# Libraries and Scripts
+Lib/
+Scripts/
