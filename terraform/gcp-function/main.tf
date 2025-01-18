@@ -48,7 +48,7 @@ resource "google_cloudfunctions2_function" "weather_function" {
 
   event_trigger {
     event_type = "google.cloud.pubsub.topic.v1.messagePublished"
-    pubsub_topic   = google_pubsub_topic.weather_topic.name
+    pubsub_topic   = google_pubsub_topic.weather_topic.id
   }
 }
 
