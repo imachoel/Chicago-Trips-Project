@@ -70,8 +70,8 @@ jobs:
           entry_point: 'fetch_weather_data'
           event_trigger_pubsub_topic: 'projects/${{ secrets.GCP_PROJECT_ID }}/topics/cron-topic'
           environment_variables: |-
-            WEATHER_API_KEY      = '${{ secrets.WEATHER_API_KEY }}'
-            GCP_PROJECT_ID       = '${{ secrets.GCP_PROJECT_ID }}'
-            BIGQUERY_DATASET_ID  = '${{ secrets.BIGQUERY_DATASET_ID }}'
-            BIGQUERY_TABLE_NAME  = '${{ secrets.BIGQUERY_TABLE_NAME }}'
+            WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}
+            GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
+            BIGQUERY_DATASET_ID=${{ secrets.BIGQUERY_DATASET_ID }}
+            BIGQUERY_TABLE_NAME=${{ secrets.BIGQUERY_TABLE_NAME }}
 
