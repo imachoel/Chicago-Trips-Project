@@ -52,7 +52,7 @@ jobs:
           project_id: '${{ secrets.GCP_PROJECT_ID }}'
           source_dir: './ingest-weather-data-func'
           entry_point: 'fetch_weather_data'
-          event_trigger_pubsub_topic: 'projects/${{ secrets.GCP_PROJECT_ID }}/topics/cron-topic'
+          event_trigger_pubsub_topic: 'projects/${{ secrets.GCP_PROJECT_ID }}/topics/cron-weather-topic'
           environment_variables: |-
             WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}
             GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
