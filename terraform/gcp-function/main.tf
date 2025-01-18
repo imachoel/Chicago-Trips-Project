@@ -34,7 +34,6 @@ resource "google_cloudfunctions2_function" "weather_function" {
   }
 
   service_config {
-    memory_gb          = 1  # Adjust memory allocation as needed
     timeout_seconds    = 300
     environment_variables = {
       WEATHER_API_KEY      = var.weather_api_key
@@ -49,7 +48,7 @@ resource "google_cloudfunctions2_function" "weather_function" {
 
   event_trigger {
     event_type = "google.cloud.pubsub.topic.v1.messagePublished"
-    resource   = google_pubsub_topic.weather_topic.id
+    pubsub_topic   = google_pubsub_topic.weather_topic.name
   }
 }
 
