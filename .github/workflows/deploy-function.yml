@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - 'ingest-weather-data-func/**'
-      - 'terraform-gcp-function/**'
 
 env:
   GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
@@ -35,17 +34,28 @@ jobs:
           zip -r ../function.zip .
         shell: bash
 
-      - name: Upload ZIP to Terraform Directory
-        run: mv function.zip ./terraform/gcp-function/
+      
+      - id: 'upload-file'
+        uses: 'google-github-actions/upload-cloud-storage@v2'
+        with:
+          path: 'function.zip'
+          destination: '${{ secrets.GCP_PROJECT_ID }}-function-bucket'
 
-      - name: Terraform Init
-        run: terraform init
-        working-directory: ./terraform/gcp-function
 
-      - name: Terraform Plan
-        run: terraform plan -var="project_id=${{ secrets.GCP_PROJECT_ID }}" -var="weather_api_key=${{ secrets.WEATHER_API_KEY }}" -var="bigquery_dataset_id=${{ secrets.BIGQUERY_DATASET_ID }}" -var="bigquery_table_name=${{ secrets.BIGQUERY_TABLE_NAME }}"
-        working-directory: ./terraform/gcp-function
+      - id: 'deploy-gcp-cloud-function'
+        uses: 'google-github-actions/deploy-cloud-functions@v3'
+        timeout-minutes: 10
+        with:
+          name: 'ingest-weather-data'
+          runtime: 'python310'
+          region: 'us-central1'
+          project_id: '${{ secrets.GCP_PROJECT_ID }}'
+          source_dir: './ingest-weather-data-func'
+          entry_point: 'fetch_weather_data'
+          event_trigger_pubsub_topic: 'projects/${{ secrets.GCP_PROJECT_ID }}/topics/cron-topic'
+          environment_variables: |-
+            WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}
+            GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
+            BIGQUERY_DATASET_ID=${{ secrets.BIGQUERY_DATASET_ID }}
+            BIGQUERY_TABLE_NAME=${{ secrets.BIGQUERY_TABLE_NAME }}
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID }}" -var="weather_api_key=${{ secrets.WEATHER_API_KEY }}" -var="bigquery_dataset_id=${{ secrets.BIGQUERY_DATASET_ID }}" -var="bigquery_table_name=${{ secrets.BIGQUERY_TABLE_NAME }}"
-        working-directory: ./terraform/gcp-function
