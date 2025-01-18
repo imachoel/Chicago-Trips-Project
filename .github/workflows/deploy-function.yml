@@ -47,16 +47,16 @@ jobs:
       #   env:
       #     GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
-      - name: Deploy Google Cloud Function
-        run: |
-          gcloud functions deploy ingest-weather-data-func \
-            --entry-point fetch_weather_data \
-            --runtime python310 \  # Adjust runtime based on your code
-            --trigger-http \
-            --allow-unauthenticated \
-            --region us-central1 \
-            --source gs://${{ secrets.GCP_PROJECT_ID }}-function-bucket/function.zip \
-            --project ${{ secrets.GCP_PROJECT_ID }}
+      # - name: Deploy Google Cloud Function
+      #   run: |
+      #     gcloud functions deploy ingest-weather-data-func \
+      #       --entry-point fetch_weather_data \
+      #       --runtime python310 \  # Adjust runtime based on your code
+      #       --trigger-http \
+      #       --allow-unauthenticated \
+      #       --region us-central1 \
+      #       --source gs://${{ secrets.GCP_PROJECT_ID }}-function-bucket/function.zip \
+      #       --project ${{ secrets.GCP_PROJECT_ID }}
 
       - id: 'deploy-gcp-cloud-function'
         uses: 'google-github-actions/deploy-cloud-functions@v3'
