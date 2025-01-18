@@ -8,7 +8,7 @@ def fetch_and_insert_bulk_weather_data():
     """
     Fetch weather data from an API and insert it into a BigQuery table.
     """
-    # Get environment variables test2
+    # Get environment variables test22
     api_key = os.getenv("WEATHER_API_KEY")
     api_url = os.getenv("WEATHER_API_URL")
     project_id = os.getenv("GCP_PROJECT_ID")

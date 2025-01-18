@@ -58,3 +58,20 @@ jobs:
             --source gs://${{ secrets.GCP_PROJECT_ID }}-function-bucket/function.zip \
             --project ${{ secrets.GCP_PROJECT_ID }}
 
+      - id: 'deploy-gcp-cloud-function'
+        uses: 'google-github-actions/deploy-cloud-functions@v3'
+        timeout-minutes: 10
+        with:
+          name: 'ingest-weather-data'
+          runtime: 'python310'
+          region: 'us-central1'
+          project_id: '${{ secrets.GCP_PROJECT_ID }}'
+          source_dir: './ingest-weather-data-func'
+          entry_point: 'fetch_weather_data'
+          event_trigger_pubsub_topic: 'projects/${{ secrets.GCP_PROJECT_ID }}/topics/cron-topic'
+          environment_variables: |-
+            WEATHER_API_KEY      = '${{ secrets.WEATHER_API_KEY }}'
+            GCP_PROJECT_ID       = '${{ secrets.GCP_PROJECT_ID }}'
+            BIGQUERY_DATASET_ID  = '${{ secrets.BIGQUERY_DATASET_ID }}'
+            BIGQUERY_TABLE_NAME  = '${{ secrets.BIGQUERY_TABLE_NAME }}'
+
