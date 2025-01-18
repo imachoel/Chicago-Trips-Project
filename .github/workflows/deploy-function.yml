@@ -34,11 +34,18 @@ jobs:
           zip -r ../function.zip .
         shell: bash
 
-      - name: Upload Function Code to GCS Bucket
-        run: |
-          gsutil cp function.zip gs://${{ secrets.GCP_PROJECT_ID }}-function-bucket/
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+      
+      - id: 'upload-file'
+        uses: 'google-github-actions/upload-cloud-storage@v2'
+        with:
+          path: 'function.zip'
+          destination: '${{ secrets.GCP_PROJECT_ID }}-function-bucket'
+
+      # - name: Upload Function Code to GCS Bucket
+      #   run: |
+      #     gsutil cp function.zip gs://${{ secrets.GCP_PROJECT_ID }}-function-bucket/
+      #   env:
+      #     GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
       - name: Deploy Google Cloud Function
         run: |
