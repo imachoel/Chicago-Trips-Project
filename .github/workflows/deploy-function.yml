@@ -50,3 +50,4 @@ jobs:
             --region us-central1 \
             --source gs://${{ secrets.GCP_PROJECT_ID }}-function-bucket/function.zip \
             --project ${{ secrets.GCP_PROJECT_ID }}
+
