@@ -5,19 +5,17 @@ on:
     branches:
       - main
     paths:
-      - 'ingest-weather-data-func/**' # Trigger pipeline only when function code is modified
-      - 'terraform/cloud_function/**'
+      - 'ingest-weather-data-func/**'
+
 env:
   GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
-
 jobs:
-  terraform:
+  deploy-gcp-function:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: 'actions/checkout@v4' # Must come first!
-
+        uses: 'actions/checkout@v4'
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
@@ -36,17 +34,17 @@ jobs:
           zip -r ../function.zip .
         shell: bash
 
-      - name: Upload ZIP to Terraform Directory
-        run: mv function.zip ./terraform/cloud-function/
+      - name: Upload Function Code to GCS Bucket
+        run: |
+          gsutil cp function.zip gs://${{ secrets.GCP_PROJECT_ID }}-function-bucket/
 
-      - name: Terraform Init
-        run: terraform init
-        working-directory: ./terraform/cloud-function
-
-      - name: Terraform Plan
-        run: terraform plan -var="project_id=${{ secrets.GCP_PROJECT_ID }}" -var="weather_api_key=${{ secrets.WEATHER_API_KEY }}" -var="bigquery_dataset_id=${{ secrets.BIGQUERY_DATASET_ID }}" -var="bigquery_table_name=${{ secrets.BIGQUERY_TABLE_NAME }}"
-        working-directory: ./terraform/cloud-function
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID }}" -var="weather_api_key=${{ secrets.WEATHER_API_KEY }}" -var="bigquery_dataset_id=${{ secrets.BIGQUERY_DATASET_ID }}" -var="bigquery_table_name=${{ secrets.BIGQUERY_TABLE_NAME }}"
-        working-directory: ./terraform/cloud-function
+      - name: Deploy Google Cloud Function
+        run: |
+          gcloud functions deploy ingest-weather-data-func \
+            --entry-point fetch_weather_data \
+            --runtime python310 \  # Adjust runtime based on your code
+            --trigger-http \
+            --allow-unauthenticated \
+            --region us-central1 \
+            --source gs://${{ secrets.GCP_PROJECT_ID }}-function-bucket/function.zip \
+            --project ${{ secrets.GCP_PROJECT_ID }}
