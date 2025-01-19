@@ -5,50 +5,57 @@ on:
     branches:
       - main
     paths:
-      - 'ingest-weather-data-func/**' # Trigger pipeline only when function code is modified
-      - 'terraform/cloud_function/**'
+      - 'ingest-weather-data-func/**'
+
 env:
   GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
-
 jobs:
-  terraform:
+  deploy-gcp-function:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: 'actions/checkout@v4'
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.6
 
-      - name: Authenticate with GCP
-        run: echo "${{ secrets.GOOGLE_CREDENTIALS }}" > gcp-key.json
+      - name: Set up Google Cloud SDK
+        uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
       - name: Zip Function Code
         run: |
-          cd ingestweatherdatafunc
+          cd ingest-weather-data-func
           zip -r ../function.zip .
         shell: bash
 
-      - name: Upload ZIP to Terraform Directory
-        run: mv function.zip ./terraform/cloud-function/
+      
+      - id: 'upload-file'
+        uses: 'google-github-actions/upload-cloud-storage@v2'
+        with:
+          path: 'function.zip'
+          destination: '${{ secrets.GCP_PROJECT_ID }}-function-bucket'
 
-      - name: Terraform Init
-        run: terraform init
-        working-directory: ./terraform/cloud-function
 
-      - name: Terraform Plan
-        run: terraform plan -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
-                            -var="weather_api_key=${{ secrets.WEATHER_API_KEY }}" \
-                            -var="bigquery_dataset_id=${{ secrets.BIGQUERY_DATASET_ID }}" \
-                            -var="bigquery_table_name=${{ secrets.BIGQUERY_TABLE_NAME }}"
-        working-directory: ./terraform/cloud-function/
+      - id: 'deploy-gcp-cloud-function'
+        uses: 'google-github-actions/deploy-cloud-functions@v3'
+        timeout-minutes: 10
+        with:
+          name: 'ingest-weather-data'
+          runtime: 'python310'
+          region: 'us-central1'
+          project_id: '${{ secrets.GCP_PROJECT_ID }}'
+          source_dir: './ingest-weather-data-func'
+          entry_point: 'fetch_weather_data'
+          event_trigger_pubsub_topic: 'projects/${{ secrets.GCP_PROJECT_ID }}/topics/cron-weather-topic'
+          environment_variables: |-
+            WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}
+            GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
+            BIGQUERY_DATASET_ID=${{ secrets.BIGQUERY_DATASET_ID }}
+            BIGQUERY_TABLE_NAME=${{ secrets.BIGQUERY_TABLE_NAME }}
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
-                                                  -var="weather_api_key=${{ secrets.WEATHER_API_KEY }}" \
-                                                  -var="bigquery_dataset_id=${{ secrets.BIGQUERY_DATASET_ID }}" \
-                                                  -var="bigquery_table_name=${{ secrets.BIGQUERY_TABLE_NAME }}"
-        working-directory: ./terraform/cloud-function/
